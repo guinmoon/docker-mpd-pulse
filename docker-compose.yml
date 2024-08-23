@@ -2,32 +2,22 @@ version: '2.4'
 services:
 
   mpd:
-    #build:
-    #  context: ./
-    #  dockerfile: alpine.Dockerfile
-    image: tobi312/rpi-mpd:alpine
+    image: guinmoon/rpi-mpd:debian
+    build: .
     container_name: mpd
     restart: unless-stopped
     ports:
-      - 6600:6600/tcp  # MPD Client
-      - 8000:8000/tcp  # Stream
-    ## PipeWire support
-    #environment:
-      #- XDG_RUNTIME_DIR=/tmp
+      - 6600:6600  # MPD Client
+      - 8000:8000  # Stream
     volumes:
-      - ./Music:/var/lib/mpd/music:ro
+      - ~/.config/pulse:/root/.config/pulse  
+      - ./Music:/var/lib/mpd/music:rw
       - ./playlists:/var/lib/mpd/playlists:rw
       - ./data:/var/lib/mpd/data:rw
-      #- ./mpd.conf:/etc/mpd.conf:rw
-      ## Time:
-      #- /etc/timezone:/etc/timezone:ro
-      #- /etc/localtime:/etc/localtime:ro
-      ## PipeWire support by mounting the host socket
-      #- /run/user/1000/pipewire-0:/tmp/pipewire-0
-    #devices:
-    #  - "/dev/snd:/dev/snd"
-    #cap_add:
-    #  - SYS_NICE
+      - ./mpd.conf:/etc/mpd.conf:rw
+    environment:
+      - TZ=Europe/Moscow
+      # - "PULSE_SERVER=host.docker.internal"  
     healthcheck:
       test: ["CMD-SHELL", "nc -nzv -w 3 127.0.0.1 6600 || exit 1"]
       interval: 60s
