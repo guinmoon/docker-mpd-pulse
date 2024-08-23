@@ -6,6 +6,7 @@ services:
     build: .
     container_name: mpd
     restart: unless-stopped
+    network_mode: host
     ports:
       - 6600:6600  # MPD Client
       - 8000:8000  # Stream
@@ -17,7 +18,7 @@ services:
       - ./mpd.conf:/etc/mpd.conf:rw
     environment:
       - TZ=Europe/Moscow
-      # - "PULSE_SERVER=host.docker.internal"  
+      - "PULSE_SERVER=127.0.0.1"  
     healthcheck:
       test: ["CMD-SHELL", "nc -nzv -w 3 127.0.0.1 6600 || exit 1"]
       interval: 60s
